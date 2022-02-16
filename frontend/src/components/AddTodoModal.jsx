@@ -8,7 +8,15 @@ function MyVerticallyCenteredModal(props) {
   const { onHide, todoid, showbtn } = props;
   const [title, setTitle] = React.useState("");
   const [content, setContent] = React.useState("");
-  const notify = () => toast("Todo Added Successfully");
+  const [showLoading, setShowLoading] = React.useState(false);
+
+  // validate form
+  const validateForm = () => {
+    if (title.length === 0 || content.length === 0) {
+      return false;
+    }
+    return true;
+  };
 
   const todo = {
     title: title,
@@ -17,41 +25,60 @@ function MyVerticallyCenteredModal(props) {
 
   const submitTodos = async e => {
     e.preventDefault();
-    try {
-      const data = await fetch(URL_API, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(todo),
-      });
-      const response = await data.json();
-      onHide();
-      window.location.reload();
-      notify();
-    } catch (error) {
-      console.log(error);
+    if (validateForm()) {
+      setShowLoading(true);
+      try {
+        const data = await fetch(`${URL_API}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(todo),
+        });
+        if (data.status === 201) {
+          toast.success("Todo Added Successfully");
+          window.location.reload();
+        } else {
+          toast.error("Todo Adding Failed");
+          setShowLoading(false);
+        }
+        const response = await data.text();
+        console.log(response);
+        console.log(response);
+      } catch (error) {
+        console.log(error.message);
+      }
+    } else {
+      toast.error("Please Fill All Fields");
     }
   };
 
   const updateTodos = async e => {
     console.log(todoid);
     e.preventDefault();
-    try {
-      const data = await fetch(`${URL_API}/${todoid}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(todo),
-      });
-      const response = await data.json();
-      
-      onHide();
-      window.location.reload();
-      notify();
-    } catch (error) {
-      console.log(error);
+    
+    if (validateForm()) {
+      try {
+        const data = await fetch(`${URL_API}/${todoid}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(todo),
+        });
+        const response = await data.json();
+        if (data.status === 200) {
+          toast.success("Todo Updated Successfully");
+          onHide();
+          window.location.reload();
+        } else {
+          toast.error("Todo Updation Failed");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      toast.error("Todo Updation Failed. Please fill all the fields");
     }
   };
 
@@ -97,14 +124,14 @@ function MyVerticallyCenteredModal(props) {
               type='submit'
               onClick={submitTodos}
             >
-              Submit
+              {showLoading ? "Loading..." : "Add Todo"}
             </Button>
             <Button
                className={showbtn ? "w-50 d-flex mx-auto justify-content-center" : "d-none"} 
               variant='success'
               onClick={updateTodos}
             >
-              Edit
+              {showLoading ? "Loading..." : "Update Todo"}
             </Button>
           </Form>
         </Modal.Body>

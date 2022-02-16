@@ -38,26 +38,35 @@ export const Todo = ({ todos }) => {
     }
   };
 
-  const todosData = todos.map(todo => {
+  const handleEdit = async (id, title, content) => {
+    setModalShow(true);
+    setTodoId(id);
+    setShowBtn(true);
+  }
+
+  const todosData = todos.map((todo, index) => {
     const { _id, title, content } = todo;
     return (
       <div
         key={_id}
-        className='bg-white p-3 mt-3 d-flex justify-content-between col-lg-8 col-md-12 mx-auto'
+        className='bg-white shadow p-2 mt-3 d-flex justify-content-between col-lg-8 col-md-12 mx-auto rounded'
       >
-        <article>
-          <h1>{title}</h1>
-          <p>{content}</p>
-        </article>
         <div>
-          <Button className="me-2" variant='success' onClick={() => {
-            setModalShow(true)
-            setTodoId(_id)
-            setShowBtn(true)
-            }}>
+          <article>
+            <h3 className="m-0">{title}</h3>
+            <p>{content}</p>
+          </article>
+        </div>
+        <div>
+          <Button
+            className='me-2'
+            variant='outline-primary'
+            size='sm'
+            onClick={() => handleEdit(_id, title, content)}
+          >
             <FaEdit />
           </Button>
-          <Button variant='danger' onClick={() => deleteTodo(_id)}>
+          <Button variant='danger' size='sm' onClick={() => deleteTodo(_id)}>
             <BsFillTrashFill />
           </Button>
         </div>
