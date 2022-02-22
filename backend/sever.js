@@ -8,6 +8,7 @@ const app = express();
 
 // import routers
 import todoRoute from "./routes/todo.js";
+import userRoute from "./routes/user.js";
 
 const mongodb_url = process.env.DB_CONNECTION_STRING;
 
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors());
 app.use("/todos", todoRoute);
+app.use("/users", userRoute);
 
 app.listen(PORT, (req, res) => {
   console.log("server running on port 9000");
